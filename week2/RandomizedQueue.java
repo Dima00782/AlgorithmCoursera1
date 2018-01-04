@@ -79,6 +79,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // remove and return a random item
     public Item dequeue() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
         int randomIdx = getRandomIdx();
         Item item = data[randomIdx];
         data[randomIdx] = data[head];
