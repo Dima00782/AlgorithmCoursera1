@@ -33,16 +33,18 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            return data[indices[idx++]];
+            return data[(head + indices[idx++]) % data.length];
         }
     }
 
     private void resize(int capacity) {
         Item[] newData = (Item[]) new Object[capacity];
         for (int i = 0; i < numberOfElements; ++i) {
-            newData[i] = data[i];
+            newData[i] = data[(head + i) % data.length];
         }
         data = newData;
+        head = 0;
+        tail = (head + numberOfElements) % data.length;
     }
 
     private int getRandomIdx() {
@@ -66,15 +68,16 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // add the item
     public void enqueue(Item item) {
+        if (numberOfElements == data.length) {
+            resize(2 * numberOfElements);
+        }
+        
         if (item == null) {
             throw new IllegalArgumentException();
         }
         data[tail] = item;
-        ++numberOfElements;
-        if (numberOfElements == data.length) {
-            resize(2 * numberOfElements);
-        }
         tail = (tail + 1) % data.length;
+        ++numberOfElements;
     }
 
     // remove and return a random item
@@ -85,6 +88,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         int randomIdx = getRandomIdx();
         Item item = data[randomIdx];
         data[randomIdx] = data[head];
+        data[head] = null;
 
         head = (head + 1) % data.length;
         --numberOfElements;
@@ -106,22 +110,18 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // unit testing (optional)
     public static void main(String[] args) {
-        RandomizedQueue<Integer> rq = new RandomizedQueue<>();
+        RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();
         rq.enqueue(1);
         rq.enqueue(2);
+        rq.dequeue();
         rq.enqueue(3);
         rq.enqueue(4);
         rq.enqueue(5);
+        rq.enqueue(6);
+        rq.enqueue(7);
 
         for (int val : rq) {
             System.out.println(val);
         }
-        System.out.println("------");
-
-        // System.out.println(rq.dequeue());
-        // System.out.println(rq.dequeue());
-        // System.out.println(rq.dequeue());
-        // System.out.println(rq.dequeue());
-        // System.out.println(rq.dequeue());
     }
 }
