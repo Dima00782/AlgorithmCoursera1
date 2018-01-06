@@ -1,7 +1,5 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.lang.IllegalArgumentException;
-import java.lang.UnsupportedOperationException;
 import edu.princeton.cs.algs4.StdRandom;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
@@ -37,6 +35,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
     }
 
+    // construct an empty randomized queue
+    public RandomizedQueue() {
+        data = (Item[]) new Object[1];
+    }
+
     private void resize(int capacity) {
         Item[] newData = (Item[]) new Object[capacity];
         for (int i = 0; i < numberOfElements; ++i) {
@@ -49,11 +52,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private int getRandomIdx() {
         return (head + StdRandom.uniform(0, numberOfElements)) % data.length;
-    }
-
-    // construct an empty randomized queue
-    public RandomizedQueue() {
-        data = (Item[]) new Object[1];
     }
 
     // is the randomized queue empty?

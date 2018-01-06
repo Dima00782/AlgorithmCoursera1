@@ -1,7 +1,5 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.lang.IllegalArgumentException;
-import java.lang.UnsupportedOperationException;
 
 public class Deque<Item> implements Iterable<Item> {
     private Node first = null;
