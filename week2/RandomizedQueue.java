@@ -82,6 +82,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // remove and return a random item
     public Item dequeue() {
+        if (numberOfElements > 0 && numberOfElements == data.length / 4) {
+            resize(data.length / 2);
+        }
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
@@ -119,6 +122,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         rq.enqueue(5);
         rq.enqueue(6);
         rq.enqueue(7);
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
 
         for (int val : rq) {
             System.out.println(val);
