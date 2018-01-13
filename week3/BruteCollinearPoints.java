@@ -4,30 +4,6 @@ import java.util.Arrays;
 public class BruteCollinearPoints {
     private final ArrayList<LineSegment> segments;
 
-    private Point min(Point lhs, Point rhs) {
-        return lhs.compareTo(rhs) <= 0 ? lhs : rhs;
-    }
-
-    private Point max(Point lhs, Point rhs) {
-        return lhs.compareTo(rhs) >= 0 ? lhs : rhs;
-    }
-
-    private void checkNoRepeated(Point[] points) {
-        for (int i = 1; i < points.length; ++i) {
-            if (points[i - 1].compareTo(points[i]) == 0) {
-                throw new IllegalArgumentException();
-            }
-        }
-    }
-
-    private void checkNoNull(Point[] points) {
-        for (Point p : points) {
-            if (p == null) {
-                throw new IllegalArgumentException();
-            }
-        }
-    }
-
     // finds all line segments containing 4 points
     public BruteCollinearPoints(Point[] points) {
         if (points == null) {
@@ -64,6 +40,31 @@ public class BruteCollinearPoints {
             }
         }
     }
+    
+    private Point min(Point lhs, Point rhs) {
+        return lhs.compareTo(rhs) <= 0 ? lhs : rhs;
+    }
+
+    private Point max(Point lhs, Point rhs) {
+        return lhs.compareTo(rhs) >= 0 ? lhs : rhs;
+    }
+
+    private void checkNoRepeated(Point[] points) {
+        for (int i = 1; i < points.length; ++i) {
+            if (points[i - 1].compareTo(points[i]) == 0) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    private void checkNoNull(Point[] points) {
+        for (Point p : points) {
+            if (p == null) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
 
     // the number of line segments
     public int numberOfSegments() {
