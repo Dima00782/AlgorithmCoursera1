@@ -117,7 +117,7 @@ public class Point implements Comparable<Point> {
             @Override
             public int compare(Point lhs, Point rhs) {
                 double slopeToLhs = slopeTo(lhs);
-                double slopeToRhs = slopeTo(lhs);
+                double slopeToRhs = slopeTo(rhs);
                 if (slopeToLhs < slopeToRhs) {
                     return -1;
                 }
