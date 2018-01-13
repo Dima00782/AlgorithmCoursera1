@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BruteCollinearPoints {
-    private LineSegment[] lineSegments;
+    private final ArrayList<LineSegment> segments;
 
     private Point min(Point lhs, Point rhs) {
         return lhs.compareTo(rhs) <= 0 ? lhs : rhs;
@@ -14,7 +14,15 @@ public class BruteCollinearPoints {
 
     private void checkNoRepeated(Point[] points) {
         for (int i = 1; i < points.length; ++i) {
-            if (points[i - 1] == null || points[i] == null || points[i - 1].compareTo(points[i]) == 0) {
+            if (points[i - 1].compareTo(points[i]) == 0) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    private void checkNoNull(Point[] points) {
+        for (Point p : points) {
+            if (p == null) {
                 throw new IllegalArgumentException();
             }
         }
@@ -25,24 +33,28 @@ public class BruteCollinearPoints {
         if (points == null) {
             throw new IllegalArgumentException();
         }
-        Arrays.sort(points);
-        checkNoRepeated(points);
-        ArrayList<LineSegment> segments = new ArrayList<LineSegment>();
-        for (int first = 0; first < points.length; ++first) {
-            for (int second = first + 1; second < points.length; ++second) {
-                for (int third = second + 1; third < points.length; ++third) {
-                    for (int four = third + 1; four < points.length; ++four) {
-                        double firstToSecondSlope = points[first].slopeTo(points[second]);
-                        double firstToThirdSlope = points[first].slopeTo(points[third]);
-                        double firstToFourSlope = points[first].slopeTo(points[four]);
+        checkNoNull(points);
+
+        Point[] copiedPoints = new Point[points.length];
+        System.arraycopy(points, 0, copiedPoints, 0, points.length);
+        Arrays.sort(copiedPoints);
+        checkNoRepeated(copiedPoints);
+        segments = new ArrayList<LineSegment>();
+        for (int first = 0; first < copiedPoints.length; ++first) {
+            for (int second = first + 1; second < copiedPoints.length; ++second) {
+                for (int third = second + 1; third < copiedPoints.length; ++third) {
+                    for (int four = third + 1; four < copiedPoints.length; ++four) {
+                        double firstToSecondSlope = copiedPoints[first].slopeTo(copiedPoints[second]);
+                        double firstToThirdSlope = copiedPoints[first].slopeTo(copiedPoints[third]);
+                        double firstToFourSlope = copiedPoints[first].slopeTo(copiedPoints[four]);
 
                         if (firstToSecondSlope == firstToThirdSlope && firstToThirdSlope == firstToFourSlope) {
-                            Point firstMin = min(points[first], points[second]);
-                            Point secondMin = min(points[third], points[four]);
+                            Point firstMin = min(copiedPoints[first], copiedPoints[second]);
+                            Point secondMin = min(copiedPoints[third], copiedPoints[four]);
                             Point min = min(firstMin, secondMin);
 
-                            Point firstMax = max(points[first], points[second]);
-                            Point secondMax = max(points[third], points[four]);
+                            Point firstMax = max(copiedPoints[first], copiedPoints[second]);
+                            Point secondMax = max(copiedPoints[third], copiedPoints[four]);
                             Point max = max(firstMax, secondMax);
 
                             segments.add(new LineSegment(min, max));
@@ -51,17 +63,15 @@ public class BruteCollinearPoints {
                 }
             }
         }
-
-        lineSegments = segments.toArray(new LineSegment[segments.size()]);
     }
 
     // the number of line segments
     public int numberOfSegments() {
-        return lineSegments.length;
+        return segments.size();
     }
 
     // the line segments
     public LineSegment[] segments() {
-        return lineSegments;
+        return segments.toArray(new LineSegment[segments.size()]);
     }
 }
