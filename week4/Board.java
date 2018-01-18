@@ -76,7 +76,14 @@ public class Board {
 
     // string representation of this board (in the output format specified below)
     public String toString() {
-        return null;
+        StringBuilder sb = new StringBuilder(dimension() + "\n");
+        for (int i = 0; i < field.length; ++i) {
+            for (int j = 0; j < field[i].length; ++j) {
+                sb.append(" " + field[i][j] + " ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
     // unit tests (not graded)
@@ -92,5 +99,6 @@ public class Board {
         }
         Board initial = new Board(blocks);
         StdOut.println(initial.hamming());
+        StdOut.println(initial);
     }
 }
