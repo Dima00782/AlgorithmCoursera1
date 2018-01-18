@@ -53,7 +53,20 @@ public class Board {
 
     // does this board equal y?
     public boolean equals(Object y) {
-        return false;
+        if (this == y) return true;
+        if (y == null) return false;
+        if (getClass() != y.getClass()) return false;
+
+        Board board = (Board) y;
+        if (board.dimension() != dimension()) return false;
+        for (int i = 0; i < field.length; ++i) {
+            for (int j = 0; j < field[i].length; ++j) {
+                if (field[i][j] != board.field[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     // all neighboring boards
