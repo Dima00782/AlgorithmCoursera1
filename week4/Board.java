@@ -18,7 +18,7 @@ public class Board {
 
     // board dimension n
     public int dimension() {
-        return 0;
+        return field.length;
     }
 
     // number of blocks out of place
