@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.In;
@@ -48,7 +49,25 @@ public class Board {
 
     // a board that is obtained by exchanging any pair of blocks
     public Board twin() {
-        return null;
+        int[][] blocks = new int[field.length][];
+        for (int i = 0; i < blocks.length; ++i) {
+            blocks[i] = Arrays.copyOf(field[i], field[i].length);
+        }
+
+        int i = StdRandom.uniform(0, blocks.length);
+        int j = StdRandom.uniform(0, blocks.length);
+
+        int k = StdRandom.uniform(0, blocks.length);
+        int l = StdRandom.uniform(0, blocks.length);
+        while (k == i && l == j) {
+            k = StdRandom.uniform(0, blocks.length);
+            l = StdRandom.uniform(0, blocks.length);
+        }
+        int tmp = blocks[i][j];
+        blocks[i][j] = blocks[k][l];
+        blocks[k][l] = tmp;
+
+        return new Board(blocks);
     }
 
     // does this board equal y?
