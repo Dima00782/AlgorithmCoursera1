@@ -43,7 +43,7 @@ public class Board {
 
     // is this board the goal board?
     public boolean isGoal() {
-        return false;
+        return (hamming() - numberOfMoves) == 0;
     }
 
     // a board that is obtained by exchanging any pair of blocks
