@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.ArrayList;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
@@ -7,14 +8,29 @@ import edu.princeton.cs.algs4.In;
 public class Board {
     private final int[][] field;
     private int numberOfMoves;
+    private int blankI;
+    private int blankJ;
 
     // construct a board from an n-by-n array of blocks
     // (where blocks[i][j] = block in row i, column j)
     public Board(int[][] blocks) {
         field = new int[blocks.length][];
         for (int i = 0; i < field.length; ++i) {
-            field[i] = Arrays.copyOf(blocks[i], blocks[i].length);
+            field[i] = new int[blocks[i].length];
+            for (int j = 0; j < blocks[i].length; ++j) {
+                field[i][j] = blocks[i][j];
+                if (field[i][j] == 0) {
+                    blankI = i;
+                    blankJ = j;
+                }
+            }
         }
+    }
+
+    private void swap(int[][] blocks, int i1, int j1, int i2, int j2) {
+        int tmp = blocks[i1][j1];
+        blocks[i1][j1] = blocks[i2][j2];
+        blocks[i2][j2] = tmp;
     }
 
     // board dimension n
@@ -63,9 +79,7 @@ public class Board {
             k = StdRandom.uniform(0, blocks.length);
             l = StdRandom.uniform(0, blocks.length);
         }
-        int tmp = blocks[i][j];
-        blocks[i][j] = blocks[k][l];
-        blocks[k][l] = tmp;
+        swap(blocks, i, j, k, l);
 
         return new Board(blocks);
     }
@@ -90,7 +104,32 @@ public class Board {
 
     // all neighboring boards
     public Iterable<Board> neighbors() {
-        return null;
+        ArrayList<Board> boards = new ArrayList<Board>();
+        if (blankI > 0) {
+            Board moveUp = new Board(field);
+            swap(moveUp.field, blankI, blankJ, blankI - 1, blankJ);
+            boards.add(moveUp);
+        }
+
+        if (blankI < field.length - 1) {
+            Board moveDown = new Board(field);
+            swap(moveDown.field, blankI, blankJ, blankI + 1, blankJ);
+            boards.add(moveDown);
+        }
+
+        if (blankJ > 0) {
+            Board moveLeft = new Board(field);
+            swap(moveLeft.field, blankI, blankJ, blankI - 1, blankJ);
+            boards.add(moveLeft);
+        }
+
+        if (blankJ < field.length - 1) {
+            Board moveRight = new Board(field);
+            swap(moveRight.field, blankI, blankJ, blankI, blankJ + 1);
+            boards.add(moveRight);
+        }
+
+        return boards;
     }
 
     // string representation of this board (in the output format specified below)
@@ -119,5 +158,12 @@ public class Board {
         Board initial = new Board(blocks);
         StdOut.println(initial.hamming());
         StdOut.println(initial);
+        StdOut.println();
+        StdOut.println();
+
+        for (Board b : initial.neighbors()) {
+            StdOut.println(b);
+            StdOut.println();
+        }
     }
 }
