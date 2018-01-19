@@ -136,7 +136,7 @@ public class Board {
 
         if (blankJ > 0) {
             Board moveLeft = new Board(field);
-            swap(moveLeft.field, blankI, blankJ, blankI - 1, blankJ);
+            swap(moveLeft.field, blankI, blankJ, blankI, blankJ - 1);
             boards.add(moveLeft);
         }
 
