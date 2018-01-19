@@ -33,6 +33,17 @@ public class Board {
         blocks[i2][j2] = tmp;
     }
 
+    private int distanceToRightPosition(int i, int j) {
+        int value = field[i][j];
+        if (value != 0) {
+            int expectedI = (value - 1) / field.length;
+            int expectedJ = (value - 1) - expectedI * field.length;
+            return Math.abs(i - expectedI) + Math.abs(j - expectedJ);
+        }
+
+        return value;
+    }
+
     // board dimension n
     public int dimension() {
         return field.length;
@@ -55,7 +66,13 @@ public class Board {
 
     // sum of Manhattan distances between blocks and goal
     public int manhattan() {
-        return 0;
+        int distance = 0;
+        for (int i = 0; i < field.length; ++i) {
+            for (int j = 0; j < field[i].length; ++j) {
+                distance += distanceToRightPosition(i, j);
+            }
+        }
+        return numberOfMoves + distance;
     }
 
     // is this board the goal board?
@@ -158,6 +175,7 @@ public class Board {
         Board initial = new Board(blocks);
         StdOut.println(initial.hamming());
         StdOut.println(initial);
+        StdOut.println(initial.manhattan());
         StdOut.println();
         StdOut.println();
 
