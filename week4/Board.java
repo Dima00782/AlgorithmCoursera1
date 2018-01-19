@@ -87,15 +87,17 @@ public class Board {
             blocks[i] = Arrays.copyOf(field[i], field[i].length);
         }
 
-        int i = StdRandom.uniform(0, blocks.length);
-        int j = StdRandom.uniform(0, blocks.length);
+        int i = 0;
+        int j = 0;
+        int k = 0;
+        int l = 0;
+        do {
+            i = StdRandom.uniform(0, blocks.length);
+            j = StdRandom.uniform(0, blocks.length);
 
-        int k = StdRandom.uniform(0, blocks.length);
-        int l = StdRandom.uniform(0, blocks.length);
-        while (k == i && l == j) {
             k = StdRandom.uniform(0, blocks.length);
             l = StdRandom.uniform(0, blocks.length);
-        }
+        } while (k == i && l == j || blocks[i][j] == 0 || blocks[k][l] == 0);
         swap(blocks, i, j, k, l);
 
         return new Board(blocks);
