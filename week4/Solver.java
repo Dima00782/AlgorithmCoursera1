@@ -5,18 +5,59 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.In;
 
 public class Solver {
-    private Board init;
-    private Board twinned;
-    private final ArrayList<Board> pathInit = new ArrayList<Board>();
-    private final ArrayList<Board> pathTwinned = new ArrayList<Board>();
-    private final MinPQ<Board> pqInit;
-    private final MinPQ<Board> pqTwinned;
     private final boolean isSolved;
+    private final ArrayList<Board> path = new ArrayList<Board>();
 
-    public static class ManhattanComparator implements Comparator<Board> {
+    private static class SearchNode {
+        private Board board;
+        private SearchNode predecessor;
+        private int numberOfMoves;
+
+        public SearchNode(Board other, SearchNode previous, int kmoves) {
+            board = other;
+            numberOfMoves = kmoves;
+            if (previous == null) {
+                predecessor = this;
+            } else {
+                predecessor = previous;
+            }
+        }
+
+        public int metric() {
+            return board.manhattan() + numberOfMoves;
+        }
+
+        public int getMoves() {
+            return numberOfMoves;
+        }
+
+        public Board getBoard() {
+            return board;
+        }
+
+        public SearchNode getPredecessor() {
+            return predecessor;
+        }
+
+        public Board getPredecessorBoard() {
+            return predecessor.getBoard();
+        }
+
+        public boolean equals(Object y) {
+            if (this == y) return true;
+            if (y == null) return false;
+            if (getClass() != y.getClass()) return false;
+
+            SearchNode obj = (SearchNode) y;
+
+            return obj.board.equals(board);
+        }
+    }
+
+    private static class ManhattanComparator implements Comparator<SearchNode> {
         @Override
-        public int compare(Board lhs, Board rhs) {
-            return lhs.manhattan() - rhs.manhattan();
+        public int compare(SearchNode lhs, SearchNode rhs) {
+            return lhs.metric() - rhs.metric();
         }
     }
 
@@ -26,51 +67,57 @@ public class Solver {
             throw new IllegalArgumentException();
         }
 
-        Comparator<Board> comparator = new ManhattanComparator();
-        pqInit = new MinPQ<Board>(comparator);
-        pqTwinned = new MinPQ<Board>(comparator);
+        Comparator<SearchNode> comparator = new ManhattanComparator();
+        MinPQ<SearchNode> pqInit = new MinPQ<SearchNode>(comparator);
+        MinPQ<SearchNode> pqTwinned = new MinPQ<SearchNode>(comparator);
 
-        init = initial;
-        twinned = init.twin();
+        SearchNode init = new SearchNode(initial, null, 0);
+        Board twin = initial.twin();
+        SearchNode twinned = new SearchNode(twin, null, 0);
 
         pqInit.insert(init);
         pqTwinned.insert(twinned);
 
-        while (!init.isGoal() && !twinned.isGoal()) {
+        while (!init.getBoard().isGoal() && !twinned.getBoard().isGoal()) {
             init = pqInit.delMin();
-            pathInit.add(init);
 
-            // System.out.println("BEST: ");
-            // System.out.println(init);
+            // System.out.println(init.getBoard());
+            // System.out.println("manhattan = " + init.getBoard().manhattan());
+            // System.out.println("priority = " + init.metric());
+            // System.out.println();
             twinned = pqTwinned.delMin();
-            pathTwinned.add(twinned);
 
             // System.out.println("It's neighboor");
-            for (Board neighboor : init.neighbors()) {
-                if (checkUnique(pathInit, neighboor)) {
+            for (Board neighboor : init.getBoard().neighbors()) {
+                if (!init.getPredecessorBoard().equals(neighboor)) {
+                    // System.out.println("ADD: ");
                     // System.out.println(neighboor);
-                    pqInit.insert(neighboor);
+                    pqInit.insert(new SearchNode(neighboor, init, init.getMoves() + 1));
                 }
             }
             // System.out.println("end neighboor");
 
-            for (Board neighboor : twinned.neighbors()) {
-                if (checkUnique(pathTwinned, neighboor)) {
-                    pqTwinned.insert(neighboor);
+            for (Board neighboor : twinned.getBoard().neighbors()) {
+                if (!twinned.getPredecessorBoard().equals(neighboor)) {
+                    pqTwinned.insert(new SearchNode(neighboor, twinned, twinned.getMoves() + 1));
                 }
             }
         }
 
-        isSolved = init.isGoal();
-    }
+        isSolved = init.getBoard().isGoal();
+        if (isSolved) {
+            while (init.getPredecessor() != init) {
+                path.add(init.getBoard());
+                init = init.getPredecessor();
+            }
+            path.add(initial);
 
-    private boolean checkUnique(ArrayList<Board> path, Board target) {
-        for (Board board : path) {
-            if (board.equals(target)) {
-                return false;
+            for (int i = 0; i < path.size() / 2; ++i) {
+                Board tmp = path.get(i);
+                path.set(i, path.get(path.size() - i - 1));
+                path.set(path.size() - i - 1, tmp);
             }
         }
-        return true;
     }
 
     // is the initial board solvable?
@@ -80,12 +127,16 @@ public class Solver {
 
     // min number of moves to solve initial board; -1 if unsolvable
     public int moves() {
-        return isSolvable() ? (pathInit.size() - 1) : -1;
+        if (!isSolvable()) {
+            return -1;
+        }
+        int size = path.size();
+        return size == 0 ? 0 : (path.size() - 1);
     }
 
     // sequence of boards in a shortest solution; null if unsolvable
     public Iterable<Board> solution() {
-        return isSolvable() ? pathInit : null;
+        return isSolvable() ? path : null;
     }
 
     // solve a slider puzzle (given below)

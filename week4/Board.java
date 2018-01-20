@@ -1,17 +1,17 @@
 import java.util.Arrays;
 import java.util.ArrayList;
 import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.In;
 
 public class Board {
     private final int[][] field;
-    private int numberOfMoves;
     private int blankI;
     private int blankJ;
     private boolean manhattanCalculated;
     private int manhattanDistance;
+    private int[][] twinned;
+    private boolean twinnedCalculated;
 
     // construct a board from an n-by-n array of blocks
     // (where blocks[i][j] = block in row i, column j)
@@ -58,12 +58,12 @@ public class Board {
             for (int j = 0; j < field[i].length; ++j) {
                 int goal = i * field[i].length + j + 1;
                 if (goal == field.length * field.length) {
-                    goal = 0;
+                    continue;
                 }
                 distance += goal != field[i][j] ? 1 : 0;
             }
         }
-        return numberOfMoves + distance;
+        return distance;
     }
 
     // sum of Manhattan distances between blocks and goal
@@ -80,16 +80,20 @@ public class Board {
             manhattanDistance = distance;
             manhattanCalculated = true;
         }
-        return numberOfMoves + distance;
+        return distance;
     }
 
     // is this board the goal board?
     public boolean isGoal() {
-        return (hamming() - numberOfMoves) == 0;
+        return hamming() == 0;
     }
 
     // a board that is obtained by exchanging any pair of blocks
     public Board twin() {
+        if (twinnedCalculated) {
+            return new Board(twinned);
+        }
+
         int[][] blocks = new int[field.length][];
         for (int i = 0; i < blocks.length; ++i) {
             blocks[i] = Arrays.copyOf(field[i], field[i].length);
@@ -107,6 +111,9 @@ public class Board {
             l = StdRandom.uniform(0, blocks.length);
         } while (k == i && l == j || blocks[i][j] == 0 || blocks[k][l] == 0);
         swap(blocks, i, j, k, l);
+
+        twinnedCalculated = true;
+        twinned = blocks;
 
         return new Board(blocks);
     }
@@ -136,7 +143,6 @@ public class Board {
             Board moveUp = new Board(field);
             swap(moveUp.field, blankI, blankJ, blankI - 1, blankJ);
             --moveUp.blankI;
-            moveUp.numberOfMoves = numberOfMoves + 1;
             boards.add(moveUp);
         }
 
@@ -144,7 +150,6 @@ public class Board {
             Board moveDown = new Board(field);
             swap(moveDown.field, blankI, blankJ, blankI + 1, blankJ);
             ++moveDown.blankI;
-            moveDown.numberOfMoves = numberOfMoves + 1;
             boards.add(moveDown);
         }
 
@@ -152,7 +157,6 @@ public class Board {
             Board moveLeft = new Board(field);
             swap(moveLeft.field, blankI, blankJ, blankI, blankJ - 1);
             --moveLeft.blankJ;
-            moveLeft.numberOfMoves = numberOfMoves + 1;
             boards.add(moveLeft);
         }
 
@@ -160,7 +164,6 @@ public class Board {
             Board moveRight = new Board(field);
             swap(moveRight.field, blankI, blankJ, blankI, blankJ + 1);
             ++moveRight.blankJ;
-            moveRight.numberOfMoves = numberOfMoves + 1;
             boards.add(moveRight);
         }
 
