@@ -10,6 +10,8 @@ public class Board {
     private int numberOfMoves;
     private int blankI;
     private int blankJ;
+    private boolean manhattanCalculated;
+    private int manhattanDistance;
 
     // construct a board from an n-by-n array of blocks
     // (where blocks[i][j] = block in row i, column j)
@@ -67,10 +69,16 @@ public class Board {
     // sum of Manhattan distances between blocks and goal
     public int manhattan() {
         int distance = 0;
-        for (int i = 0; i < field.length; ++i) {
-            for (int j = 0; j < field[i].length; ++j) {
-                distance += distanceToRightPosition(i, j);
+        if (manhattanCalculated) {
+            distance = manhattanDistance;
+        } else {
+            for (int i = 0; i < field.length; ++i) {
+                for (int j = 0; j < field[i].length; ++j) {
+                    distance += distanceToRightPosition(i, j);
+                }
             }
+            manhattanDistance = distance;
+            manhattanCalculated = true;
         }
         return numberOfMoves + distance;
     }
@@ -128,6 +136,7 @@ public class Board {
             Board moveUp = new Board(field);
             swap(moveUp.field, blankI, blankJ, blankI - 1, blankJ);
             --moveUp.blankI;
+            moveUp.numberOfMoves = numberOfMoves + 1;
             boards.add(moveUp);
         }
 
@@ -135,6 +144,7 @@ public class Board {
             Board moveDown = new Board(field);
             swap(moveDown.field, blankI, blankJ, blankI + 1, blankJ);
             ++moveDown.blankI;
+            moveDown.numberOfMoves = numberOfMoves + 1;
             boards.add(moveDown);
         }
 
@@ -142,6 +152,7 @@ public class Board {
             Board moveLeft = new Board(field);
             swap(moveLeft.field, blankI, blankJ, blankI, blankJ - 1);
             --moveLeft.blankJ;
+            moveLeft.numberOfMoves = numberOfMoves + 1;
             boards.add(moveLeft);
         }
 
@@ -149,6 +160,7 @@ public class Board {
             Board moveRight = new Board(field);
             swap(moveRight.field, blankI, blankJ, blankI, blankJ + 1);
             ++moveRight.blankJ;
+            moveRight.numberOfMoves = numberOfMoves + 1;
             boards.add(moveRight);
         }
 
