@@ -12,6 +12,7 @@ public class Solver {
         private Board board;
         private SearchNode predecessor;
         private int numberOfMoves;
+        private int manhattan;
 
         public SearchNode(Board other, SearchNode previous, int kmoves) {
             board = other;
@@ -21,10 +22,11 @@ public class Solver {
             } else {
                 predecessor = previous;
             }
+            manhattan = board.manhattan();
         }
 
         public int metric() {
-            return board.manhattan() + numberOfMoves;
+            return manhattan + numberOfMoves;
         }
 
         public int getMoves() {
@@ -87,9 +89,11 @@ public class Solver {
             // System.out.println();
             twinned = pqTwinned.delMin();
 
-            // System.out.println("It's neighboor");
+            // System.out.println("compare:");
+            // System.out.println(init);
             for (Board neighboor : init.getBoard().neighbors()) {
-                if (!init.getPredecessorBoard().equals(neighboor)) {
+                // System.out.println("It's neighboor");
+                if (init.getPredecessor() == init || !init.getPredecessorBoard().equals(neighboor)) {
                     // System.out.println("ADD: ");
                     // System.out.println(neighboor);
                     pqInit.insert(new SearchNode(neighboor, init, init.getMoves() + 1));
@@ -98,7 +102,7 @@ public class Solver {
             // System.out.println("end neighboor");
 
             for (Board neighboor : twinned.getBoard().neighbors()) {
-                if (!twinned.getPredecessorBoard().equals(neighboor)) {
+                if (twinned.getPredecessor() == twinned || !twinned.getPredecessorBoard().equals(neighboor)) {
                     pqTwinned.insert(new SearchNode(neighboor, twinned, twinned.getMoves() + 1));
                 }
             }
