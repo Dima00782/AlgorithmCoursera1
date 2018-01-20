@@ -127,24 +127,28 @@ public class Board {
         if (blankI > 0) {
             Board moveUp = new Board(field);
             swap(moveUp.field, blankI, blankJ, blankI - 1, blankJ);
+            --moveUp.blankI;
             boards.add(moveUp);
         }
 
         if (blankI < field.length - 1) {
             Board moveDown = new Board(field);
             swap(moveDown.field, blankI, blankJ, blankI + 1, blankJ);
+            ++moveDown.blankI;
             boards.add(moveDown);
         }
 
         if (blankJ > 0) {
             Board moveLeft = new Board(field);
             swap(moveLeft.field, blankI, blankJ, blankI, blankJ - 1);
+            --moveLeft.blankJ;
             boards.add(moveLeft);
         }
 
         if (blankJ < field.length - 1) {
             Board moveRight = new Board(field);
             swap(moveRight.field, blankI, blankJ, blankI, blankJ + 1);
+            ++moveRight.blankJ;
             boards.add(moveRight);
         }
 
