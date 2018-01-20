@@ -9,10 +9,10 @@ public class Solver {
     private final ArrayList<Board> path = new ArrayList<Board>();
 
     private static class SearchNode {
-        private Board board;
-        private SearchNode predecessor;
-        private int numberOfMoves;
-        private int manhattan;
+        private final Board board;
+        private final SearchNode predecessor;
+        private final int numberOfMoves;
+        private final int manhattan;
 
         public SearchNode(Board other, SearchNode previous, int kmoves) {
             board = other;
