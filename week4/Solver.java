@@ -5,7 +5,6 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.In;
 
 public class Solver {
-    private int numberOfMoves;
     private Board init;
     private Board twinned;
     private final ArrayList<Board> pathInit = new ArrayList<Board>();
@@ -14,21 +13,22 @@ public class Solver {
     private final MinPQ<Board> pqTwinned;
     private final boolean isSolved;
 
+    public static class ManhattanComparator implements Comparator<Board> {
+        @Override
+        public int compare(Board lhs, Board rhs) {
+            return lhs.manhattan() - rhs.manhattan();
+        }
+    }
+
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
         if (initial == null) {
             throw new IllegalArgumentException();
         }
 
-        Comparator<Board> manhattanCompator = new Comparator<Board>() {
-            @Override
-            public int compare(Board lhs, Board rhs) {
-                return lhs.manhattan() - rhs.manhattan();
-            }
-        };
-
-        pqInit = new MinPQ<Board>(manhattanCompator);
-        pqTwinned = new MinPQ<Board>(manhattanCompator);
+        Comparator<Board> comparator = new ManhattanComparator();
+        pqInit = new MinPQ<Board>(comparator);
+        pqTwinned = new MinPQ<Board>(comparator);
 
         init = initial;
         twinned = init.twin();
