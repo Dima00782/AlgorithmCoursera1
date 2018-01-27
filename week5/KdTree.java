@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import java.util.ArrayList;
 
 public class KdTree {
     private class Node {
@@ -53,9 +54,27 @@ public class KdTree {
         return null;
     }
 
-    private boolean pointBelongRectangle(Point2D point, RectHV rect) {
-        return point.x() >= rect.xmin() && point.x() <= rect.xmax() 
-            && point.y() >= rect.ymin() && point.y() <= rect.ymax();
+    private void range(Node x, RectHV rect, int step, ArrayList<Point2D> result) {
+        if (x == null) return;
+        if (rect.contains(x.point)) result.add(x.point);
+
+        if (step % 2 == 0) {
+            if (rect.xmin() <= x.point.x()) {
+                range(x.left, rect, step + 1, result);
+            }
+
+            if (rect.xmax() > x.point.x()) {
+                range(x.right, rect, step + 1, result);
+            }
+        } else {
+            if (rect.ymin() <= x.point.y()) {
+                range(x.left, rect, step + 1, result);
+            }
+
+            if (rect.ymax() > x.point.y()) {
+                range(x.right, rect, step + 1, result);
+            }
+        }
     }
 
     // is the set empty?
@@ -87,27 +106,28 @@ public class KdTree {
 
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rect) {
-        return null;
+        ArrayList<Point2D> result = new ArrayList<Point2D>();
+        range(root, rect, 0, result);
+        return result;
     }
 
     // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
-        return null;
+        if (isEmpty()) return null;
     }
 
     // unit testing of the methods (optional)
     public static void main(String[] args) {
         KdTree tree = new KdTree();
-        tree.insert(new Point2D(0.75, 0.0));
-        tree.insert(new Point2D(0.75, 0.25));
-        tree.insert(new Point2D(0.5, 0.25));
-        tree.insert(new Point2D(0.0, 0.0));
-        tree.insert(new Point2D(0.75, 0.75));
-        tree.insert(new Point2D(1.0, 0.0));
-        tree.insert(new Point2D(0.5, 0.25));
-        tree.insert(new Point2D(0.75, 0.25));
-        tree.insert(new Point2D(0.75, 0.75));
+        tree.insert(new Point2D(7, 2));
+        tree.insert(new Point2D(5, 4));
+        tree.insert(new Point2D(2, 3));
+        tree.insert(new Point2D(4, 7));
+        tree.insert(new Point2D(9, 6));
 
-        System.out.println(tree.size());
+        for (Point2D p : tree.range(new RectHV(0, 4, 10, 10))) {
+            System.out.println(p);
+        }
+        System.out.println();
     }
 }
