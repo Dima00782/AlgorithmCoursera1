@@ -20,6 +20,12 @@ public class KdTree {
     public KdTree() {
     }
 
+    private void nullGuard(Object obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private Node put(Node current, Point2D p, int step) {
         if (current == null) return new Node(p);
         double cmp = 0;
@@ -77,6 +83,56 @@ public class KdTree {
         }
     }
 
+    private Point2D nearest(Node root, RectHV rect, Point2D target, Point2D min, int step) {
+        if (root == null) return min;
+
+        // update min
+        if (min == null || target.distanceSquaredTo(root.point) < target.distanceSquaredTo(min)) {
+            min = root.point;
+        }
+
+        // if no child => return min
+        if (root.left == null && root.right == null) {
+            return min;
+        }
+
+        RectHV leftRect;
+        RectHV rightRect;
+        boolean goLeft;
+        if (step % 2 == 0) {
+            leftRect = new RectHV(rect.xmin(), rect.ymin(), root.point.x(), rect.ymax());
+            rightRect = new RectHV(root.point.x(), rect.ymin(), rect.xmax(), rect.ymax());
+            goLeft = target.x() < root.point.x();
+        } else {
+            leftRect = new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), root.point.y());
+            rightRect = new RectHV(rect.xmin(), root.point.y(), rect.xmax(), rect.ymax());
+            goLeft = target.y() < root.point.y();
+        }
+
+        Node close = root.left;
+        Node distant = root.right;
+        RectHV closeRect = leftRect;
+        RectHV distantRect = rightRect;
+
+        if (!goLeft) {
+            close = root.right;
+            distant = root.left;
+            RectHV tmp = closeRect;
+            closeRect = distantRect;
+            distantRect = tmp;
+        }
+
+        min = nearest(close, closeRect, target, min, step + 1);
+
+        // prune rule
+        if (distantRect.distanceSquaredTo(target) >= min.distanceSquaredTo(target)) {
+            return min;
+        }
+        min = nearest(distant, distantRect, target, min, step + 1);
+
+        return min;
+    }
+
     // is the set empty?
     public boolean isEmpty() {
         return size() == 0;
@@ -89,6 +145,7 @@ public class KdTree {
 
     // add the point to the set (if it is not already in the set)
     public void insert(Point2D p) {
+        nullGuard(p);
         if (contains(p)) return;
         root = put(root, p, 0);
         ++numberOfElements;
@@ -96,6 +153,7 @@ public class KdTree {
 
     // does the set contain point p?
     public boolean contains(Point2D p) {
+        nullGuard(p);
         Node found = get(root, p);
         return found != null && p.equals(found.point);
     }
@@ -106,6 +164,7 @@ public class KdTree {
 
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rect) {
+        nullGuard(rect);
         ArrayList<Point2D> result = new ArrayList<Point2D>();
         range(root, rect, 0, result);
         return result;
@@ -113,21 +172,25 @@ public class KdTree {
 
     // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
+        nullGuard(p);
         if (isEmpty()) return null;
+
+        return nearest(root, new RectHV(0, 0, 1, 1), p, root.point, 0);
     }
 
     // unit testing of the methods (optional)
     public static void main(String[] args) {
         KdTree tree = new KdTree();
-        tree.insert(new Point2D(7, 2));
-        tree.insert(new Point2D(5, 4));
-        tree.insert(new Point2D(2, 3));
-        tree.insert(new Point2D(4, 7));
-        tree.insert(new Point2D(9, 6));
+        tree.insert(new Point2D(0.7, 0.2));
+        tree.insert(new Point2D(0.5, 0.4));
+        tree.insert(new Point2D(0.2, 0.3));
+        tree.insert(new Point2D(0.4, 0.7));
+        tree.insert(new Point2D(0.9, 0.6));
 
         for (Point2D p : tree.range(new RectHV(0, 4, 10, 10))) {
             System.out.println(p);
         }
         System.out.println();
+        System.out.println(tree.nearest(new Point2D(0.7, 0.87)));
     }
 }
