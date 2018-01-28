@@ -3,6 +3,9 @@ import edu.princeton.cs.algs4.RectHV;
 import java.util.ArrayList;
 
 public class KdTree {
+    private Node root;
+    private int numberOfElements;
+
     private class Node {
         public Node left;
         public Node right;
@@ -13,8 +16,6 @@ public class KdTree {
         }
     }
 
-    private Node root;
-    private int numberOfElements;
 
     // construct an empty set of points
     public KdTree() {
@@ -38,8 +39,7 @@ public class KdTree {
         return current;
     }
 
-    private Node get(Node root, Point2D p) {
-        Node x = root;
+    private Node get(Node x, Point2D p) {
         int step = 0;
         while (x != null) {
             double cmp = 0;
@@ -83,16 +83,16 @@ public class KdTree {
         }
     }
 
-    private Point2D nearest(Node root, RectHV rect, Point2D target, Point2D min, int step) {
-        if (root == null) return min;
+    private Point2D nearest(Node current, RectHV rect, Point2D target, Point2D min, int step) {
+        if (current == null) return min;
 
         // update min
-        if (min == null || target.distanceSquaredTo(root.point) < target.distanceSquaredTo(min)) {
-            min = root.point;
+        if (min == null || target.distanceSquaredTo(current.point) < target.distanceSquaredTo(min)) {
+            min = current.point;
         }
 
         // if no child => return min
-        if (root.left == null && root.right == null) {
+        if (current.left == null && current.right == null) {
             return min;
         }
 
@@ -100,23 +100,23 @@ public class KdTree {
         RectHV rightRect;
         boolean goLeft;
         if (step % 2 == 0) {
-            leftRect = new RectHV(rect.xmin(), rect.ymin(), root.point.x(), rect.ymax());
-            rightRect = new RectHV(root.point.x(), rect.ymin(), rect.xmax(), rect.ymax());
-            goLeft = target.x() < root.point.x();
+            leftRect = new RectHV(rect.xmin(), rect.ymin(), current.point.x(), rect.ymax());
+            rightRect = new RectHV(current.point.x(), rect.ymin(), rect.xmax(), rect.ymax());
+            goLeft = target.x() < current.point.x();
         } else {
-            leftRect = new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), root.point.y());
-            rightRect = new RectHV(rect.xmin(), root.point.y(), rect.xmax(), rect.ymax());
-            goLeft = target.y() < root.point.y();
+            leftRect = new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), current.point.y());
+            rightRect = new RectHV(rect.xmin(), current.point.y(), rect.xmax(), rect.ymax());
+            goLeft = target.y() < current.point.y();
         }
 
-        Node close = root.left;
-        Node distant = root.right;
+        Node close = current.left;
+        Node distant = current.right;
         RectHV closeRect = leftRect;
         RectHV distantRect = rightRect;
 
         if (!goLeft) {
-            close = root.right;
-            distant = root.left;
+            close = current.right;
+            distant = current.left;
             RectHV tmp = closeRect;
             closeRect = distantRect;
             distantRect = tmp;
@@ -159,8 +159,7 @@ public class KdTree {
     }
 
     // draw all points to standard draw
-    public void draw() {
-    }
+    public void draw() { /*nothing to do here*/ }
 
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rect) {

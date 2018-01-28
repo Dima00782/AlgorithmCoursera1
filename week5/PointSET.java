@@ -78,5 +78,6 @@ public class PointSET {
 
     // unit testing of the methods (optional)
     public static void main(String[] args) {
+        /*nothing to do here*/
     }
 }
